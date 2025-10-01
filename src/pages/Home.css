@@ -1,0 +1,607 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Home Page Styles */
+.home {
+  font-family: 'Poppins', sans-serif;
+}
+
+#homeSection {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin-top: 70px;
+  scroll-snap-align: start;
+}
+
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.tag-line {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  position: absolute;
+  top: 70px;
+  left: 0;
+  transition: all 1s ease;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  cursor: default;
+}
+
+.tag-line h1 {
+  font-family: 'Lora', serif;
+  font-size: 80px;
+  font-weight: 700;
+  margin: 0 30px;
+  transition: all 2s ease;
+}
+
+.tag-line h2 {
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 600;
+  margin: 0px 30px;
+  transition: all 2s ease;
+}
+
+.description {
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 500;
+  margin-left: 30px;
+  margin-top: 17rem;
+  position: absolute;
+  left: -100%;
+  transition: all 2s ease;
+  opacity: 0;
+  cursor: default;
+}
+
+.description strong {
+  font-family: 'Lora', serif;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.game-redirect-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 25%;
+  height: 30%;
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  background-color: rgba(2, 2, 2, 0.452);
+  backdrop-filter: blur(5px);
+  border-radius: 20px;
+  right: -100%;
+  transition: all 5s ease;
+}
+
+.game-redirect-container h2 {
+  color: white;
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  cursor: default;
+}
+
+.rules {
+  list-style-type: disc;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  justify-content: center;
+  margin-bottom: 20px;
+  display: none;
+  transition: all 5s ease-in-out;
+  cursor: default;
+}
+
+.rules li {
+  color: white;
+  margin-bottom: 20px;
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: default;
+}
+
+.game-redirect {
+  text-decoration: none;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  text-align: center;
+  padding: 15px 25px;
+  border-radius: 10px;
+  border: 3px solid #fff;
+  transition: all 0.3s ease;
+  animation: background-blink 2s infinite;
+  background: linear-gradient(135deg, #0edf23, #0ba91c);
+}
+
+@keyframes background-blink {
+  0% {
+    filter: drop-shadow(0px 0px 10px #0edf23);
+  }
+  50% {
+    filter: drop-shadow(0px 0px 20px #0edf23);
+  }
+  100% {
+    filter: drop-shadow(0px 0px 15px #0edf23);
+  }
+}
+
+.new-features {
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 40px 0;
+}
+
+.new-features h1 {
+  color: white;
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.new-features-container {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 60%;
+  height: auto;
+  max-height: 70vh;
+}
+
+.new-feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 50%;
+  height: auto;
+  min-height: 400px;
+  background-color: rgba(0, 0, 0, 0.774);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  margin: 0 20px;
+  padding: 25px 20px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: white;
+  cursor: pointer;
+}
+
+.new-feature-card img {
+  height: 180px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  border: 3px solid #ffffffa1;
+  padding: 10px;
+}
+
+.new-feature-card h3 {
+  color: white;
+  font-family: 'poppins', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.new-feature-card p {
+  color: white;
+  font-family: 'poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.new-feature-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 20px #0edf23;
+}
+
+.about {
+  color: #fff;
+  display: flex;
+  padding: 50px 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  scroll-snap-align: start;
+}
+
+.about-team {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-team h1 {
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.team-members {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+  width: 100%;
+  height: 90%;
+}
+
+.team-member:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.team-member {
+  display: flex;
+  flex-direction: row;
+  margin: 15px 0;
+  width: 100%;
+  height: 15rem;
+}
+
+.member-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
+  height: 100%;
+}
+
+.member-image img {
+  height: 80%;
+  border-radius: 50%;
+}
+
+.member-description {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.even {
+  border-radius: 20px 0 0 20px;
+}
+
+.odd {
+  border-radius: 0 20px 20px 0;
+}
+
+.member-description h3 {
+  font-family: 'Lora', serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.member-description h3 br {
+  display: none;
+}
+
+.member-description ul {
+  list-style-type: none;
+}
+
+.member-description ul li {
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.member-socials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 30%;
+}
+
+.member-socials a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  color: #fff;
+  font-size: 30px;
+  margin: 0 10px;
+}
+
+.member-socials img {
+  height: 50px;
+  transition: all 0.3s ease;
+  margin: 10px;
+}
+
+.member-socials img:hover {
+  transform: scale(1.2);
+}
+
+.about-project {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 50px;
+}
+
+.about-project-description {
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 800px;
+}
+
+.about-project h1 {
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.about-project-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 70%;
+  margin-top: 30px;
+}
+
+.about-project-image iframe {
+  border-radius: 15px;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  height: 10vh;
+  background-color: rgba(0, 0, 0);
+}
+
+.footer-message {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  width: 50%;
+  text-align: center;
+}
+
+.footer-links {
+  width: 50%;
+  text-align: center;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 10px;
+}
+
+.footer-links a:hover {
+  border-bottom: 2px solid #ffffff;
+}
+
+/* Profile card grid */
+.profile-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  width: 95%;
+  max-width: 1200px;
+  margin: 40px auto;
+  justify-items: center;
+  padding: 20px;
+}
+
+.profile-card-grid .pc-card-wrapper {
+  width: 100%;
+  max-width: 350px;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1150px) {
+  .tag-line {
+    width: 100%;
+  }
+
+  .description {
+    width: 50%;
+  }
+  
+  .new-features {
+    height: auto;
+    min-height: 150vh;
+    padding: 30px 0;
+  }
+
+  .new-features-container {
+    margin: 20px 0;
+    width: 90%;
+    flex-direction: column;
+  }
+
+  .new-feature-card {
+    width: 85%;
+    margin: 15px 0;
+    min-height: 350px;
+    padding: 20px 15px;
+  }
+
+  .new-feature-card img {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .description {
+    width: 50%;
+  }
+
+  .about-team h1 {
+    font-size: 40px;
+  }
+
+  .team-member {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .team-member:nth-child(even) {
+    flex-direction: column;
+  }
+
+  .member-description {
+    width: 90%;
+    height: 100%;
+    align-items: center;
+    border-radius: 15px;
+  }
+
+  .member-description h3 {
+    text-align: center;
+  }
+
+  .member-description h3 br {
+    display: block;
+  }
+
+  .member-socials a {
+    font-size: 20px;
+  }
+
+  .member-image {
+    margin-bottom: 30px;
+  }
+
+  .member-image img {
+    height: 150px;
+    width: 150px;
+  }
+
+  .footer {
+    text-align: center;
+    flex-direction: column;
+    height: 20vh;
+  }
+
+  .footer-message {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+@media screen and (max-width: 620px) {
+  .video-background {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% 50%;
+    z-index: -1;
+  }
+
+  .tag-line {
+    width: 100%;
+    text-align: center;
+    margin-left: 0;
+  }
+
+  .tag-line h1 {
+    font-size: 60px;
+  }
+
+  .tag-line h2 {
+    font-size: 40px;
+  }
+
+  #homeSection {
+    height: 110vh;
+  }
+
+  .description {
+    display: none;
+  }
+
+  .game-redirect-container {
+    width: 90%;
+    height: 45%;
+    bottom: -100%;
+    right: 50%;
+    transform: translateX(50%);
+    transition: all 1s ease-in-out;
+  }
+
+  .game-redirect-container h2 {
+    font-size: 30px;
+    margin-bottom: 7px;
+  }
+
+  .rules {
+    display: block;
+    width: 80%;
+    margin-bottom: 5px;
+  }
+
+  .rules li {
+    font-family: 'Lora', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .about-project-image iframe {
+    width: 100%;
+    height: 250px;
+  }
+}

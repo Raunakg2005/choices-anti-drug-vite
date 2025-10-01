@@ -1,0 +1,202 @@
+/* Home Page CSS - Clean base for your styling */
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.home {
+  font-family: 'Poppins', sans-serif;
+}
+
+#homeSection {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin-top: 70px;
+}
+
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.tag-line {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  position: absolute;
+  top: 70px;
+  left: 0;
+  padding: 25px 0;
+  cursor: default;
+}
+
+.tag-line h1 {
+  font-family: 'Lora', serif;
+  font-size: 80px;
+  font-weight: 700;
+  margin: 0 30px;
+}
+
+.tag-line h2 {
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 600;
+  margin: 0 30px;
+}
+
+.description {
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 500;
+  margin-left: 30px;
+  margin-top: 17rem;
+  position: absolute;
+  cursor: default;
+}
+
+.game-redirect-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 25%;
+  height: 30%;
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  background-color: rgba(2, 2, 2, 0.452);
+  backdrop-filter: blur(5px);
+  border-radius: 20px;
+}
+
+.game-redirect {
+  text-decoration: none;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 500;
+  padding: 15px 25px;
+  border-radius: 10px;
+  border: 3px solid #fff;
+  background: linear-gradient(135deg, #0edf23, #0ba91c);
+  transition: all 0.3s ease;
+}
+
+.new-features {
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 40px 0;
+}
+
+.new-features h1 {
+  color: white;
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.new-features-container {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 80%;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.new-feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 300px;
+  min-height: 400px;
+  background-color: rgba(0, 0, 0, 0.774);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 25px 20px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: white;
+  cursor: pointer;
+}
+
+.new-feature-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 20px #0edf23;
+}
+
+.about {
+  color: #fff;
+  display: flex;
+  padding: 50px 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.about-team {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.about-team h1 {
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Profile card grid */
+.profile-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  width: 90%;
+  margin: 40px auto;
+  justify-items: center;
+  padding: 20px;
+}
+
+.about-project {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 50px;
+}
+
+.about-project h1 {
+  font-family: 'Lora', serif;
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 10vh;
+  background-color: rgba(0, 0, 0, 1);
+  color: white;
+}
+
+/* Add your custom styles below this line */
