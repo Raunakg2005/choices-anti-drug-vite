@@ -221,7 +221,6 @@ const Home = () => {
             handle="raunakgupta"
             status="Student"
             contactText="Connect"
-            // prefer a local copy; if missing the component will gracefully fallback
             avatarUrl="/assets/rkg-1.png"
             miniAvatarUrl="/assets/rkg.jpg"
             enableTilt={true}
@@ -350,8 +349,8 @@ const Home = () => {
           Made with ❤️ by <strong>Sudo</strong>
         </div>
         <div className="footer-links">
-          <a href="https://github.com/spark-lucifer/Choices-an-Anti-Drug-Adventure" target="_blank" rel="noopener noreferrer">GitHub</a>
-          <a href="https://youtu.be/hTmDJXYRnEk" target="_blank" rel="noopener noreferrer">YouTube</a>
+          <a href="https://github.com/Raunakg2005/choices-anti-drug-vite" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://youtu.be/hTmDJXYRnE" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
       </div>
     </div>

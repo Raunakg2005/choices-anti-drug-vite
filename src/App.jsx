@@ -34,6 +34,8 @@ function App() {
           <Route path="/dynamic-game" element={<DynamicGame />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/pledge-certificate" element={<PledgeCertificate />} />
+          {/* Legacy path from the original static site - accept both spellings */}
+          <Route path="/Pledge-Ceartificate" element={<PledgeCertificate />} />
           <Route path="/project-feedback" element={<ProjectFeedback />} />
         </Routes>
       </div>

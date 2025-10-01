@@ -7,11 +7,16 @@ const OldNegative = () => {
   const [isIntroShown, setIsIntroShown] = useState(false);
   const [showChoices, setShowChoices] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [currentText, setCurrentText] = useState('');
   const [isMobile, setIsMobile] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [isFullScreenMsgShown, setIsFullScreenMsgShown] = useState(true);
+  const [isStoryTelling, setIsStoryTelling] = useState(
+    localStorage.getItem('isStorytelling') === 'true' || true
+  );
   
   const typingTimeoutRef = useRef(null);
+  const dialogueRef = useRef(null);
   const synthRef = useRef(window.speechSynthesis);
   const navigate = useNavigate();
 
@@ -59,57 +64,75 @@ const OldNegative = () => {
     ]
   ];
 
-  const preloadImages = () => {
-    for (let i = 0; i <= 3; i++) {
+  const imageUrls = [
+    '/assets/main-game/old/Negative/0.jpg',
+    '/assets/main-game/old/Negative/1.jpg',
+    '/assets/main-game/old/Negative/2.jpg',
+    '/assets/main-game/old/Negative/3.jpg',
+    '/assets/main-game/old/Negative/4.jpg',
+  ];
+
+  const preloadImages = async () => {
+    const promises = imageUrls.map((url) => new Promise((resolve) => {
       const img = new Image();
-      img.src = `/assets/main-game/old/negative/${i}.jpg`;
-    }
+      img.onload = resolve;
+      img.onerror = resolve;
+      img.src = url;
+    }));
+    await Promise.all(promises);
+    setImagesLoaded(true);
   };
 
   const speak = (text) => {
-    synthRef.current.cancel();
+    if (!isStoryTelling || isMobile) return;
+
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.8;
-    utterance.pitch = 1;
-    synthRef.current.speak(utterance);
+    const setVoiceAndSpeak = () => {
+      const voices = synthRef.current.getVoices();
+      utterance.voice = voices.find(v => v.lang && v.lang.startsWith && v.lang.startsWith('en')) || voices[0];
+      utterance.rate = 0.98;
+      utterance.pitch = 1;
+      synthRef.current.speak(utterance);
+    };
+
+    if (synthRef.current.getVoices().length === 0) {
+      synthRef.current.addEventListener('voiceschanged', setVoiceAndSpeak, { once: true });
+    } else {
+      setVoiceAndSpeak();
+    }
   };
 
-  const typeText = (text, callback) => {
-    setIsTyping(true);
-    setCurrentText('');
-    let index = 0;
-    
-    const typeNextChar = () => {
-      if (index < text.length) {
-        setCurrentText(text.substring(0, index + 1));
-        index++;
-        typingTimeoutRef.current = setTimeout(typeNextChar, 30);
-      } else {
-        setIsTyping(false);
-        if (callback) callback();
-      }
-    };
-    
-    typeNextChar();
+  const stopSpeaking = () => {
+    if (synthRef.current && synthRef.current.cancel) synthRef.current.cancel();
   };
 
   const updateDialogue = () => {
-    if (currentStoryIndex < story.length) {
-      const text = story[currentStoryIndex];
-      speak(text);
-      typeText(text, () => {
-        setTimeout(() => {
-          if (choices[currentStoryIndex] && choices[currentStoryIndex].length > 0) {
-            setShowChoices(true);
-          } else if (currentStoryIndex < story.length - 1) {
-            // Auto continue to next story after 2 seconds only if not at end
-            setTimeout(() => {
-              setCurrentStoryIndex(prev => prev + 1);
-            }, 2000);
-          }
-        }, 500);
-      });
+    if (!story[currentStoryIndex] || !dialogueRef.current) return;
+    setIsTyping(true);
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
     }
+
+    const fullText = story[currentStoryIndex];
+    let idx = 0;
+    dialogueRef.current.textContent = '';
+
+    const type = () => {
+      if (!dialogueRef.current) return;
+      idx += 1;
+      dialogueRef.current.textContent = fullText.substring(0, idx);
+      if (idx < fullText.length) {
+        typingTimeoutRef.current = setTimeout(type, 30);
+      } else {
+        setIsTyping(false);
+        // Show choices only on final line
+        if (currentStoryIndex === story.length - 1) setShowChoices(true);
+      }
+    };
+
+    typingTimeoutRef.current = setTimeout(type, 30);
   };
 
   const handleChoice = (choice) => {
@@ -125,13 +148,38 @@ const OldNegative = () => {
     }
   };
 
-  const handleStartGame = () => {
-    setIsIntroShown(true);
-    preloadImages();
-    setTimeout(() => {
-      speak(story[0]);
-      updateDialogue();
-    }, 100);
+  const handleScreenClick = (event) => {
+    const clickedElement = event.target;
+    if (clickedElement.closest && (clickedElement.closest('.menu-icon') || clickedElement.closest('.menu-items') || clickedElement.closest('.choice-box') || clickedElement.closest('.fullscreen-msg'))) return;
+
+    if (!isIntroShown) {
+      setIsIntroShown(true);
+      preloadImages();
+      return;
+    }
+
+    if (isTyping) {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      if (dialogueRef.current) dialogueRef.current.textContent = story[currentStoryIndex];
+      setIsTyping(false);
+      if (currentStoryIndex === story.length - 1) setShowChoices(true);
+    } else {
+      const clickX = event.clientX;
+      const halfScreenWidth = window.innerWidth / 2;
+      if (clickX > halfScreenWidth) {
+        const nextIndex = Math.min(currentStoryIndex + 1, story.length - 1);
+        stopSpeaking();
+        setShowChoices(false);
+        setCurrentStoryIndex(nextIndex);
+      } else {
+        const prevIndex = Math.max(currentStoryIndex - 1, 0);
+        setCurrentStoryIndex(prevIndex);
+        setShowChoices(false);
+      }
+    }
   };
 
   const handleMenu = () => {
@@ -155,15 +203,34 @@ const OldNegative = () => {
     setCurrentStoryIndex(0);
     setIsIntroShown(false);
     setShowChoices(false);
+    setImagesLoaded(false);
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   useEffect(() => {
-    if (isIntroShown && currentStoryIndex > 0) {
-      updateDialogue();
+    if (!isMobile && imagesLoaded) {
+      const timer = setTimeout(() => setIsFullScreenMsgShown(false), 7000);
+      return () => clearTimeout(timer);
     }
-  }, [currentStoryIndex]);
+  }, [isMobile, imagesLoaded]);
+
+  useEffect(() => {
+    if (!isIntroShown) return;
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+
+    stopSpeaking();
+
+    const start = setTimeout(() => {
+      speak(story[currentStoryIndex]);
+      updateDialogue();
+    }, 80);
+
+    return () => clearTimeout(start);
+  }, [isIntroShown, currentStoryIndex]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -178,71 +245,44 @@ const OldNegative = () => {
   };
 
   return (
-    <div className="old-negative">
-      <div className="game-header">
-        <button className="menu-btn" onClick={handleMenu}>
-          ☰
-        </button>
-        <h1>Old Age - The Final Chapter</h1>
+    <div className="childhood-game" onClick={handleScreenClick}>
+      <div className="menu-icon" onClick={() => setShowMenu(!showMenu)}>
+        <img src={showMenu ? "/assets/cross-icon.png" : "/assets/menu-icon.png"} alt="menu" />
       </div>
 
       {showMenu && (
-        <div className="menu-overlay">
-          <div className="menu-content">
-            <button onClick={handleHome}>Home</button>
-            <button onClick={() => setShowMenu(false)}>Close</button>
+        <div className="menu-items">
+          <div className="menu-item-container">
+            <div className="menu-item">Menu</div>
+            <div className="menu-item" onClick={handleHome}>Home</div>
           </div>
         </div>
       )}
 
-      <div className="game-container">
-        {!isIntroShown ? (
-          <div className="intro-screen">
-            <div className="intro-content">
-              <h2>Old Age - Negative Path</h2>
-              <p>The consequences of a lifetime of poor choices.</p>
-              <button className="start-btn" onClick={handleStartGame}>
-                Start Chapter
-              </button>
-            </div>
+      {!isIntroShown && (
+        <div className="intro">
+          <h1>Old Age - Negative Path</h1>
+          <div className="right-half blink"></div>
+          <div className="instructions">
+            <p>Click on right half of screen to continue</p>
           </div>
-        ) : (
-          <div className="story-section">
-            <div className="story-image">
-              <img 
-                src={`/assets/main-game/old/negative/${getImageIndex()}.jpg`}
-                alt={`Old age scene ${getImageIndex()}`}
-                onError={(e) => {
-                  console.log('Image load error:', e.target.src);
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
+        </div>
+      )}
 
-            <div className="dialogue-section">
-              <div className="dialogue-box">
-                <div className="dialogue-text">
-                  {currentText}
-                  {isTyping && <span className="cursor">|</span>}
-                </div>
-              </div>
+    <div className="gamecontainer">
+      <div className="background" style={{ backgroundImage: `url(/assets/main-game/old/Negative/${getImageIndex()}.jpg)` }}></div>
 
-              {showChoices && choices[currentStoryIndex] && (
-                <div className="choices">
-                  {choices[currentStoryIndex].map((choice, index) => (
-                    <button 
-                      key={index}
-                      className="choice-btn"
-                      onClick={() => handleChoice(choice)}
-                    >
-                      {choice.text}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+        {showChoices && choices[currentStoryIndex] && (
+          <div className="choice-box">
+            {choices[currentStoryIndex].map((choice, idx) => (
+              <button key={idx} className="choice" onClick={() => handleChoice(choice)}>
+                {choice.text}
+              </button>
+            ))}
           </div>
         )}
+
+        {isIntroShown && <div className={`dialogue-box ${'with-voice'}`} ref={dialogueRef}></div>}
       </div>
     </div>
   );

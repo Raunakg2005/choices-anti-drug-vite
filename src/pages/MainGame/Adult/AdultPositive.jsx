@@ -11,7 +11,6 @@ const AdultPositive = () => {
     localStorage.getItem('isStorytelling') === 'true' || true
   );
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [currentCharacter, setCurrentCharacter] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [showChoices, setShowChoices] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState(false);
@@ -69,43 +68,59 @@ const AdultPositive = () => {
 
   const speak = (text) => {
     if (!isStoryTelling || isMobile) return;
+
     synthRef.current.cancel();
+
     const utterance = new SpeechSynthesisUtterance(text);
-    const voices = synthRef.current.getVoices();
-    utterance.voice = voices.find(v => v.lang.startsWith('en')) || voices[0];
-    utterance.rate = 0.9;
-    synthRef.current.speak(utterance);
+
+    const setVoiceAndSpeak = () => {
+      const voices = synthRef.current.getVoices();
+      utterance.voice = voices.find(v => v.lang && v.lang.startsWith('en')) || voices[0];
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      synthRef.current.speak(utterance);
+    };
+
+    if (synthRef.current.getVoices().length === 0) {
+      synthRef.current.addEventListener('voiceschanged', setVoiceAndSpeak, { once: true });
+    } else {
+      setVoiceAndSpeak();
+    }
+  };
+
+  const stopSpeaking = () => {
+    synthRef.current.cancel();
   };
 
   const updateDialogue = () => {
     if (!story[currentStoryIndex] || !dialogueRef.current) return;
+
     setIsTyping(true);
-    setCurrentCharacter(0);
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+
+    let localChar = 0;
+    const length = story[currentStoryIndex].length;
+
     const type = () => {
-      if (dialogueRef.current && story[currentStoryIndex]) {
-        dialogueRef.current.textContent = story[currentStoryIndex].substring(0, currentCharacter + 1);
-      }
-      if (currentCharacter < story[currentStoryIndex].length - 1) {
-        setCurrentCharacter(prev => prev + 1);
+      if (!dialogueRef.current) return;
+      dialogueRef.current.textContent = story[currentStoryIndex].substring(0, localChar + 1);
+
+      if (localChar < length - 1) {
+        localChar += 1;
         typingTimeoutRef.current = setTimeout(type, 30);
       } else {
         setIsTyping(false);
-        // Auto continue after typing finishes if no choices
-        setTimeout(() => {
-          if (choices[currentStoryIndex] && choices[currentStoryIndex].length > 0) {
-            setShowChoices(true);
-          } else if (currentStoryIndex < story.length - 1) {
-            // Auto continue to next story after 2 seconds only if not at end
-            setTimeout(() => {
-              setCurrentStoryIndex(prev => prev + 1);
-            }, 2000);
-          }
-        }, 500);
+        typingTimeoutRef.current = null;
+        if (currentStoryIndex === story.length - 1) setShowChoices(true);
       }
     };
-    type();
+
+    typingTimeoutRef.current = setTimeout(type, 30);
   };
 
   const handleScreenClick = (event) => {
@@ -115,18 +130,17 @@ const AdultPositive = () => {
 
     if (!isIntroShown) {
       setIsIntroShown(true);
-      setTimeout(() => {
-        speak(story[0]);
-        updateDialogue();
-      }, 300);
       return;
     }
 
     if (isTyping) {
-      clearTimeout(typingTimeoutRef.current);
-      setCurrentCharacter(story[currentStoryIndex].length);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
       if (dialogueRef.current) dialogueRef.current.textContent = story[currentStoryIndex];
       setIsTyping(false);
+      if (currentStoryIndex === story.length - 1) setShowChoices(true);
     } else {
       const clickX = event.clientX;
       const halfScreenWidth = window.innerWidth / 2;
@@ -134,25 +148,33 @@ const AdultPositive = () => {
       if (clickX > halfScreenWidth) {
         const nextIndex = Math.min(currentStoryIndex + 1, story.length - 1);
         setCurrentStoryIndex(nextIndex);
-        synthRef.current.cancel();
-        
-        if (nextIndex < story.length - 1) speak(story[nextIndex]);
-        setTimeout(updateDialogue, 100);
-        if (nextIndex === story.length - 1) setShowChoices(true);
+        stopSpeaking();
       } else {
         const prevIndex = Math.max(currentStoryIndex - 1, 0);
         setCurrentStoryIndex(prevIndex);
         setShowChoices(false);
-        setTimeout(updateDialogue, 100);
       }
     }
   };
 
+  // Centralized: when intro is shown or story index changes, start speech + typing once
   useEffect(() => {
-    if (isIntroShown && currentStoryIndex > 0) {
-      updateDialogue();
+    if (!isIntroShown) return;
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
     }
-  }, [currentStoryIndex]);
+
+    stopSpeaking();
+
+    const start = setTimeout(() => {
+      speak(story[currentStoryIndex]);
+      updateDialogue();
+    }, 80);
+
+    return () => clearTimeout(start);
+  }, [isIntroShown, currentStoryIndex]);
 
   useEffect(() => {
     return () => {

@@ -7,19 +7,140 @@ const EndingNegative = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showRestart, setShowRestart] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
   const typingTimeoutRef = useRef(null);
   const synthRef = useRef(window.speechSynthesis);
+  const storyTextRef = useRef(null);
   const navigate = useNavigate();
 
-  const endingText = "Your story has come to a tragic end. The choices you made throughout your life led you down a path of addiction and despair. Your potential was wasted, your relationships destroyed, and your dreams never realized. This is a reminder that every choice matters, and saying no to drugs could have led to a completely different life. Thank you for experiencing this cautionary tale.";
+  
+  const buildDynamicEnding = () => {
+    const score = parseInt(sessionStorage.getItem('userScore') || '0');
+
+    let recorded = null;
+    try {
+      const raw = sessionStorage.getItem('badChoices');
+      if (raw) recorded = JSON.parse(raw);
+    } catch (e) {
+      recorded = null;
+    }
+
+    const stages = [
+      {
+        name: 'Childhood',
+        consequence: 'You ignored early guidance and picked up risky habits that set the foundation for later problems.',
+        actions: ['Experimented with substances at a young age', 'Skipped school and ignored caregivers', 'Began lying to cover behavior']
+      },
+      {
+        name: 'Teenage',
+        consequence: 'You gave in to peer pressure and experimented, which damaged your health and school life.',
+        actions: ['Tried drugs at parties', 'Neglected studies and responsibilities', 'Started mixing with risky peers']
+      },
+      {
+        name: 'Adult',
+        consequence: 'You relied on substances to cope with stress, losing jobs and trust of loved ones.',
+        actions: ['Missed work and lost jobs', 'Broke promises to family and friends', 'Used substances to numb emotions']
+      },
+      {
+        name: 'Old age',
+        consequence: 'Addiction consumed your health and relationships, leaving you isolated and unwell.',
+        actions: ['Suffered chronic health decline', 'Lost close relationships', 'Lived in isolation and financial hardship']
+      }
+    ];
+
+    const lines = [];
+    lines.push('Your story ends tragically. Here are the consequences of the choices you made:');
+
+    for (let i = 0; i < stages.length; i++) {
+      const requiredPositives = i + 1; 
+
+      const stageWasBad = recorded
+        ? !!(recorded[stages[i].name] || recorded[stages[i].name.toLowerCase()])
+        : score < requiredPositives;
+
+      if (stageWasBad) {
+        lines.push(`${i + 1}. ${stages[i].name}: ${stages[i].consequence}`);
+        lines.push('   Examples of what happened:');
+        for (const act of stages[i].actions) {
+          lines.push(`   - ${act}`);
+        }
+      }
+    }
+
+    if (lines.length === 1) {
+      lines.push('Throughout your life you made choices that gradually eroded your wellbeing — missed opportunities, lost relationships, and declining health. Every choice mattered.');
+    }
+
+    lines.push('\nThis is a reminder that every choice matters. Saying no to drugs can change the path of a life.');
+    return lines.join('\n\n');
+  };
+
+  const endingText = buildDynamicEnding();
 
   const speak = (text) => {
     synthRef.current.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.8;
+    utterance.rate = 0.6; // Slower rate for better sync
     utterance.pitch = 1;
-    synthRef.current.speak(utterance);
+    utterance.volume = 1;
+    
+    // Add event listeners to handle speech events
+    utterance.onstart = () => {
+      console.log('Speech started');
+      setIsSpeaking(true);
+    };
+    
+    utterance.onend = () => {
+      console.log('Speech ended');
+      setIsSpeaking(false);
+      // Clean up keep-alive interval
+      if (utterance.keepAliveInterval) {
+        clearInterval(utterance.keepAliveInterval);
+      }
+    };
+    
+    utterance.onerror = (event) => {
+      console.error('Speech error:', event.error);
+      setIsSpeaking(false);
+      // Try to restart speech if it fails
+      if (event.error !== 'canceled') {
+        setTimeout(() => {
+          synthRef.current.speak(utterance);
+        }, 500);
+      }
+    };
+    
+    utterance.onpause = () => {
+      console.log('Speech paused');
+    };
+    
+    utterance.onresume = () => {
+      console.log('Speech resumed');
+    };
+    
+    // Ensure speech synthesis is ready
+    if (synthRef.current.speaking) {
+      synthRef.current.cancel();
+    }
+    
+    // Small delay to ensure clean start
+    setTimeout(() => {
+      synthRef.current.speak(utterance);
+      
+      // Workaround for browser speech synthesis timeout issue
+      // Resume speech every 10 seconds to prevent cutoff
+      const keepAliveInterval = setInterval(() => {
+        if (synthRef.current.speaking && synthRef.current.paused) {
+          synthRef.current.resume();
+        } else if (!synthRef.current.speaking) {
+          clearInterval(keepAliveInterval);
+        }
+      }, 10000);
+      
+      // Store interval to clean up later
+      utterance.keepAliveInterval = keepAliveInterval;
+    }, 100);
   };
 
   const typeText = (text) => {
@@ -27,11 +148,26 @@ const EndingNegative = () => {
     setCurrentText('');
     let index = 0;
     
+    // Calculate typing speed to match speech duration
+    // Average speech rate: ~150-200 words per minute
+    // At rate 0.6, it's slower, so adjust accordingly
+    const estimatedSpeechDuration = (text.length / 8) * 1000; // Rough estimate
+    const typingSpeed = Math.max(30, estimatedSpeechDuration / text.length); // Min 30ms per character
+    
     const typeNextChar = () => {
       if (index < text.length) {
-        setCurrentText(prev => prev + text.charAt(index));
+        setCurrentText(prev => {
+          const newText = prev + text.charAt(index);
+          // Auto-scroll to bottom after text update
+          setTimeout(() => {
+            if (storyTextRef.current) {
+              storyTextRef.current.scrollTop = storyTextRef.current.scrollHeight;
+            }
+          }, 10);
+          return newText;
+        });
         index++;
-        typingTimeoutRef.current = setTimeout(typeNextChar, 50);
+        typingTimeoutRef.current = setTimeout(typeNextChar, typingSpeed);
       } else {
         setIsTyping(false);
         setTimeout(() => {
@@ -56,16 +192,28 @@ const EndingNegative = () => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
+    // Longer initial delay to ensure everything is loaded
+    const startDelay = setTimeout(() => {
+      // Start audio first
       speak(endingText);
-      typeText(endingText);
-    }, 1000);
+      // Start typing with slight delay to sync with speech start
+      setTimeout(() => {
+        typeText(endingText);
+      }, 500);
+    }, 1500);
 
     return () => {
+      clearTimeout(startDelay);
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-      synthRef.current.cancel();
+      if (synthRef.current) {
+        // Cancel any ongoing speech
+        synthRef.current.cancel();
+        // Clear any keep-alive intervals
+        const utterances = synthRef.current.getVoices(); // This helps ensure cleanup
+      }
+      setIsSpeaking(false);
     };
-  }, []);
+  }, [endingText]);
 
   return (
     <div className="ending-negative">
@@ -101,7 +249,7 @@ const EndingNegative = () => {
 
           <div className="ending-text">
             <h2>The End</h2>
-            <div className="story-text">
+            <div className="story-text" ref={storyTextRef}>
               {currentText}
               {isTyping && <span className="cursor">|</span>}
             </div>

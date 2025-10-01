@@ -1,0 +1,198 @@
+.pledge-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 80px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pledge-container {
+  max-width: 800px;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.pledge-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.pledge-header h1 {
+  font-size: 1.8rem;
+  color: #fbbf24;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.pledge-header p {
+  color: #cbd5e1;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.certificate-preview {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.certificate-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
+.pledge-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.name-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: #fbbf24;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.name-input::placeholder {
+  color: #94a3b8;
+}
+
+.consent-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e2e8f0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.consent-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #fbbf24;
+}
+
+.consent-checkbox span {
+  font-size: 0.95rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1e293b;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fcd34d, #fbbf24);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(251, 191, 36, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #cbd5e1;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.privacy-note {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin: 8px 0 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border-left: 3px solid #10b981;
+}
+
+@media (max-width: 768px) {
+  .pledge-container {
+    padding: 24px 16px;
+  }
+
+  .pledge-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .certificate-preview {
+    padding: 12px;
+  }
+}

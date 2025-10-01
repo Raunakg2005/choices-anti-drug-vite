@@ -11,7 +11,6 @@ const OldPositive = () => {
     localStorage.getItem('isStorytelling') === 'true' || true
   );
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [currentCharacter, setCurrentCharacter] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [showChoices, setShowChoices] = useState(false);
   const [showOutro, setShowOutro] = useState(false);
@@ -179,67 +178,72 @@ const OldPositive = () => {
   // Typing animation with synchronized speech
   const updateDialogue = () => {
     if (!story[currentStoryIndex] || !dialogueRef.current) return;
-    
+
     console.log('Updating dialogue for story index:', currentStoryIndex);
     console.log('Story text:', story[currentStoryIndex]);
-    
+
     setIsTyping(true);
-    setCurrentCharacter(0);
-    
+
     // Clear any existing timeouts
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
     }
-    
+
     // Clear dialogue box first
     dialogueRef.current.textContent = '';
-    
-    // Calculate typing speed to match speech duration
+
     const text = story[currentStoryIndex];
-    const estimatedSpeechDuration = text.length * 80; // ~80ms per character for speech
-    const typingSpeed = Math.max(25, estimatedSpeechDuration / text.length); // Sync typing with speech
-    
     // Start speech synthesis with a small delay to sync with typing
     setTimeout(() => {
-      speak(story[currentStoryIndex]);
+      speak(text);
     }, 100);
-    
+
+    let localChar = 0;
+    const length = text.length;
+    const typeSpeed = 30; // consistent speed across pages
+
     const type = () => {
-      if (dialogueRef.current && story[currentStoryIndex]) {
-        const text = story[currentStoryIndex].substring(0, currentCharacter + 1);
-        dialogueRef.current.textContent = text;
-      }
-      
-      if (currentCharacter < story[currentStoryIndex].length - 1) {
-        setCurrentCharacter(prev => prev + 1);
-        typingTimeoutRef.current = setTimeout(type, typingSpeed);
+      if (!dialogueRef.current) return;
+      dialogueRef.current.textContent = text.substring(0, localChar + 1);
+
+      if (localChar < length - 1) {
+        localChar += 1;
+        typingTimeoutRef.current = setTimeout(type, typeSpeed);
       } else {
         setIsTyping(false);
-        // Auto continue after typing finishes
-        setTimeout(() => {
-          // Check if we're at the end of the story
-          if (currentStoryIndex === story.length - 1) {
-            setTimeout(() => {
-              setShowOutro(true);
-              setIsStoryTelling(false);
-            }, 2000);
-          }
-        }, 1000); // Give more time for speech to finish
+        typingTimeoutRef.current = null;
+        // End-of-story behavior
+        if (currentStoryIndex === story.length - 1) {
+          setTimeout(() => {
+            setShowOutro(true);
+            setIsStoryTelling(false);
+          }, 2000);
+        }
       }
     };
-    
-    // Start typing immediately
-    type();
+
+    typingTimeoutRef.current = setTimeout(type, typeSpeed);
   };
 
-  // Update dialogue when story index changes
+  // Centralized: when intro is shown or story index changes, start speech + typing once
   useEffect(() => {
-    if (isIntroShown) {
-      console.log('Story index changed to:', currentStoryIndex);
-      console.log('Current background image will be:', imageUrls[Math.min(currentStoryIndex, imageUrls.length - 1)]);
-      updateDialogue();
+    if (!isIntroShown) return;
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
     }
-  }, [currentStoryIndex, isIntroShown]);
+
+    stopSpeaking();
+
+    const start = setTimeout(() => {
+      speak(story[currentStoryIndex]);
+      updateDialogue();
+    }, 80);
+
+    return () => clearTimeout(start);
+  }, [isIntroShown, currentStoryIndex]);
 
   // Cleanup on unmount  
   useEffect(() => {
@@ -272,9 +276,6 @@ const OldPositive = () => {
 
     if (!isIntroShown) {
       setIsIntroShown(true);
-      setTimeout(() => {
-        updateDialogue();
-      }, 300);
       return;
     }
 
@@ -285,13 +286,22 @@ const OldPositive = () => {
 
     if (isTyping) {
       // Finish typing instantly but keep speech going
-      clearTimeout(typingTimeoutRef.current);
-      setCurrentCharacter(story[currentStoryIndex].length);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
       if (dialogueRef.current) {
         dialogueRef.current.textContent = story[currentStoryIndex];
       }
       setIsTyping(false);
       console.log('💨 Typing finished instantly, speech continues...');
+      // If last line, schedule outro (keep existing timing)
+      if (currentStoryIndex === story.length - 1) {
+        setTimeout(() => {
+          setShowOutro(true);
+          setIsStoryTelling(false);
+        }, 2000);
+      }
     } else {
       const clickX = event.clientX;
       const halfScreenWidth = window.innerWidth / 2;
@@ -302,15 +312,12 @@ const OldPositive = () => {
         setCurrentStoryIndex(nextIndex);
         stopSpeaking();
         setIsMenuShown(false);
-        
-        setTimeout(updateDialogue, 100);
       } else {
         // Go back in story
         const prevIndex = Math.max(currentStoryIndex - 1, 0);
         setCurrentStoryIndex(prevIndex);
         setShowChoices(false);
         setShowOutro(false);
-        setTimeout(updateDialogue, 100);
       }
     }
   };
