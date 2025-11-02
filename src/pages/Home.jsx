@@ -245,7 +245,8 @@ const Home = () => {
             handle="rahulk"
             status="Student"
             contactText="Contact"
-            avatarUrl="https://media.licdn.com/dms/image/D4D03AQFg7zU_GLhX5Q/profile-displayphoto-shrink_200_200/0/1689414065287?e=2147483647&v=beta&t=Xd__cVA3nevSnqbLUimJIfplzF_5Rh8wpRcSPBXh9DQ"
+            avatarUrl="/assets/pc-1.png"
+            miniAvatarUrl="/assets/pc.jpg"
             enableTilt={true}
             onContactClick={() => window.open('https://www.linkedin.com/in/kunalshah017','_blank')}
           />

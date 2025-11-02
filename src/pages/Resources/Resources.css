@@ -1,0 +1,631 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.resources-container {
+  min-height: 100vh;
+  background: #0a0e27;
+  padding: 110px 20px 40px;
+  color: #20d858;
+  font-family: 'Press Start 2P', cursive;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated Background Grid */
+.resources-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(24, 176, 71, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 176, 71, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridScroll 20s linear infinite;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+@keyframes gridScroll {
+  0% {
+    transform: perspective(500px) rotateX(60deg) translateY(0);
+  }
+  100% {
+    transform: perspective(500px) rotateX(60deg) translateY(50px);
+  }
+}
+
+.resources-header {
+  text-align: center;
+  margin-bottom: 50px;
+  position: relative;
+  z-index: 1;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.resources-header h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #18b047;
+  text-shadow: 
+    0 0 10px rgba(24, 176, 71, 0.8),
+    0 0 20px rgba(24, 176, 71, 0.4),
+    2px 2px 0px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+  animation: titlePulse 2s ease-in-out infinite;
+  line-height: 1.6;
+}
+
+@keyframes titlePulse {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px rgba(24, 176, 71, 0.8),
+      0 0 20px rgba(24, 176, 71, 0.4),
+      2px 2px 0px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    text-shadow: 
+      0 0 20px rgba(24, 176, 71, 1),
+      0 0 30px rgba(24, 176, 71, 0.6),
+      2px 2px 0px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.resources-header p {
+  color: #20d858;
+  font-size: 0.7rem;
+  margin-bottom: 25px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(32, 216, 88, 0.5);
+  line-height: 1.8;
+}
+
+.btn-refresh {
+  padding: 14px 28px;
+  background: linear-gradient(145deg, #18b047 0%, #0a8b34 100%);
+  color: white;
+  border: 3px solid #20d858;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  box-shadow: 
+    0 0 20px rgba(24, 176, 71, 0.5),
+    inset 0 0 10px rgba(255, 255, 255, 0.1),
+    0 5px 0 #0a5d28;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+
+.btn-refresh:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 30px rgba(32, 216, 88, 0.7),
+    inset 0 0 15px rgba(255, 255, 255, 0.2),
+    0 7px 0 #0a5d28;
+  border-color: #2ef56b;
+}
+
+.btn-refresh:active {
+  transform: translateY(3px);
+  box-shadow: 
+    0 0 20px rgba(24, 176, 71, 0.5),
+    inset 0 0 10px rgba(0, 0, 0, 0.3),
+    0 2px 0 #0a5d28;
+}
+
+.category-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.category-tab {
+  padding: 12px 24px;
+  background: linear-gradient(145deg, #1a1f3a 0%, #0f1428 100%);
+  color: #20d858;
+  border: 3px solid #18b047;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  box-shadow: 
+    0 0 15px rgba(24, 176, 71, 0.3),
+    inset 0 0 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Corner decorations for tabs */
+.category-tab::before,
+.category-tab::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #18b047;
+  transition: all 0.3s ease;
+}
+
+.category-tab::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.category-tab::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+.category-tab:hover {
+  background: linear-gradient(145deg, #2a2f4a 0%, #1f2438 100%);
+  border-color: #20d858;
+  box-shadow: 
+    0 0 25px rgba(32, 216, 88, 0.5),
+    inset 0 0 15px rgba(24, 176, 71, 0.1);
+  transform: translateY(-2px);
+}
+
+.category-tab.active {
+  background: linear-gradient(145deg, #18b047 0%, #0a8b34 100%);
+  color: white;
+  border-color: #20d858;
+  box-shadow: 
+    0 0 30px rgba(32, 216, 88, 0.7),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.category-tab.active::before,
+.category-tab.active::after {
+  border-color: #2ef56b;
+  box-shadow: 0 0 10px rgba(46, 245, 107, 0.7);
+}
+
+.category-icon {
+  font-size: 1rem;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto 50px;
+  position: relative;
+  z-index: 1;
+}
+
+.resource-card {
+  background: linear-gradient(145deg, #1a1f3a 0%, #0f1428 100%);
+  border: 3px solid #18b047;
+  padding: 25px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 
+    0 0 20px rgba(24, 176, 71, 0.3),
+    inset 0 0 20px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.resource-card:nth-child(1) { animation-delay: 0.1s; }
+.resource-card:nth-child(2) { animation-delay: 0.2s; }
+.resource-card:nth-child(3) { animation-delay: 0.3s; }
+.resource-card:nth-child(4) { animation-delay: 0.4s; }
+.resource-card:nth-child(5) { animation-delay: 0.5s; }
+.resource-card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Corner decorations */
+.resource-card::before,
+.resource-card::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border: 3px solid #18b047;
+  transition: all 0.3s ease;
+}
+
+.resource-card::before {
+  top: -3px;
+  left: -3px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.resource-card::after {
+  bottom: -3px;
+  right: -3px;
+  border-left: none;
+  border-top: none;
+}
+
+.resource-card:hover {
+  border-color: #20d858;
+  box-shadow: 
+    0 0 35px rgba(32, 216, 88, 0.6),
+    inset 0 0 25px rgba(24, 176, 71, 0.1);
+  transform: translateY(-5px);
+}
+
+.resource-card:hover::before,
+.resource-card:hover::after {
+  border-color: #2ef56b;
+  box-shadow: 0 0 10px rgba(46, 245, 107, 0.7);
+}
+
+.resource-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.resource-header h3 {
+  color: #20d858;
+  font-size: 0.9rem;
+  margin: 0;
+  flex: 1;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 0 0 10px rgba(32, 216, 88, 0.5);
+  line-height: 1.6;
+}
+
+.resource-badge {
+  padding: 6px 12px;
+  background: linear-gradient(145deg, #18b047 0%, #0a8b34 100%);
+  border: 2px solid #20d858;
+  color: white;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-family: 'Press Start 2P', cursive;
+  box-shadow: 0 0 15px rgba(24, 176, 71, 0.5);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.resource-description {
+  color: rgba(32, 216, 88, 0.9);
+  line-height: 1.8;
+  margin-bottom: 20px;
+  min-height: 60px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.6rem;
+  text-shadow: 0 0 5px rgba(32, 216, 88, 0.3);
+}
+
+.resource-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 2px solid rgba(24, 176, 71, 0.3);
+}
+
+.resource-source {
+  color: rgba(32, 216, 88, 0.6);
+  font-size: 0.55rem;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 0 0 5px rgba(32, 216, 88, 0.2);
+}
+
+.btn-visit {
+  padding: 10px 20px;
+  background: linear-gradient(145deg, #18b047 0%, #0a8b34 100%);
+  color: white;
+  text-decoration: none;
+  border: 2px solid #20d858;
+  font-weight: 600;
+  font-size: 0.6rem;
+  transition: all 0.2s ease;
+  font-family: 'Press Start 2P', cursive;
+  box-shadow: 
+    0 0 15px rgba(24, 176, 71, 0.5),
+    inset 0 0 10px rgba(255, 255, 255, 0.1),
+    0 4px 0 #0a5d28;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+  display: inline-block;
+}
+
+.btn-visit:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 25px rgba(32, 216, 88, 0.7),
+    inset 0 0 15px rgba(255, 255, 255, 0.2),
+    0 6px 0 #0a5d28;
+  border-color: #2ef56b;
+}
+
+.btn-visit:active {
+  transform: translateY(2px);
+  box-shadow: 
+    0 0 15px rgba(24, 176, 71, 0.5),
+    inset 0 0 10px rgba(0, 0, 0, 0.3),
+    0 2px 0 #0a5d28;
+}
+
+.emergency-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(145deg, rgba(255, 77, 77, 0.15) 0%, rgba(139, 10, 10, 0.1) 100%);
+  border: 3px solid rgba(255, 77, 77, 0.5);
+  position: relative;
+  z-index: 1;
+  box-shadow: 
+    0 0 30px rgba(255, 77, 77, 0.3),
+    inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Corner decorations for emergency section */
+.emergency-section::before,
+.emergency-section::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ff4d4d;
+}
+
+.emergency-section::before {
+  top: -3px;
+  left: -3px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.emergency-section::after {
+  bottom: -3px;
+  right: -3px;
+  border-left: none;
+  border-top: none;
+}
+
+.emergency-section h2 {
+  color: #ff4d4d;
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 
+    0 0 15px rgba(255, 77, 77, 0.8),
+    0 0 25px rgba(255, 77, 77, 0.4),
+    2px 2px 0px rgba(0, 0, 0, 0.5);
+  animation: emergencyPulse 2s ease-in-out infinite;
+  line-height: 1.8;
+}
+
+@keyframes emergencyPulse {
+  0%, 100% {
+    text-shadow: 
+      0 0 15px rgba(255, 77, 77, 0.8),
+      0 0 25px rgba(255, 77, 77, 0.4),
+      2px 2px 0px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    text-shadow: 
+      0 0 25px rgba(255, 77, 77, 1),
+      0 0 35px rgba(255, 77, 77, 0.6),
+      2px 2px 0px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.emergency-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.emergency-card {
+  background: linear-gradient(145deg, rgba(26, 10, 10, 0.8) 0%, rgba(15, 5, 5, 0.9) 100%);
+  border: 3px solid rgba(255, 77, 77, 0.5);
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 
+    0 0 20px rgba(255, 77, 77, 0.3),
+    inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Corner decorations for emergency cards */
+.emergency-card::before,
+.emergency-card::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ff4d4d;
+  transition: all 0.3s ease;
+}
+
+.emergency-card::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.emergency-card::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+.emergency-card:hover {
+  transform: translateY(-5px);
+  border-color: #ff6b6b;
+  box-shadow: 
+    0 0 35px rgba(255, 77, 77, 0.6),
+    inset 0 0 25px rgba(255, 77, 77, 0.1);
+}
+
+.emergency-card:hover::before,
+.emergency-card:hover::after {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
+}
+
+.emergency-card h3 {
+  color: #ff4d4d;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+  line-height: 1.6;
+}
+
+.emergency-number {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ff4d4d;
+  margin: 15px 0;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 
+    0 0 15px rgba(255, 77, 77, 0.8),
+    0 0 25px rgba(255, 77, 77, 0.4);
+  letter-spacing: 2px;
+}
+
+.emergency-card p:last-child {
+  color: rgba(255, 107, 107, 0.8);
+  font-size: 0.6rem;
+  font-family: 'Press Start 2P', cursive;
+  line-height: 1.6;
+  text-shadow: 0 0 5px rgba(255, 77, 77, 0.3);
+}
+
+.resources-loading,
+.no-resources {
+  text-align: center;
+  color: #20d858;
+  font-size: 1rem;
+  padding: 60px 20px;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 0 0 10px rgba(32, 216, 88, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .resources-container {
+    padding: 90px 15px 30px;
+  }
+
+  .resources-header h1 {
+    font-size: 1.2rem;
+    line-height: 2;
+  }
+
+  .resources-header p {
+    font-size: 0.6rem;
+    line-height: 2;
+  }
+
+  .btn-refresh {
+    font-size: 0.55rem;
+    padding: 12px 22px;
+  }
+
+  .resources-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .category-tabs {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+
+  .category-tab {
+    flex-shrink: 0;
+    font-size: 0.55rem;
+    padding: 10px 18px;
+  }
+
+  .resource-card {
+    padding: 20px;
+  }
+
+  .resource-header h3 {
+    font-size: 0.75rem;
+    line-height: 1.8;
+  }
+
+  .resource-badge {
+    font-size: 0.5rem;
+    padding: 5px 10px;
+  }
+
+  .resource-description {
+    font-size: 0.55rem;
+    line-height: 2;
+  }
+
+  .btn-visit {
+    font-size: 0.55rem;
+    padding: 8px 16px;
+  }
+
+  .emergency-section h2 {
+    font-size: 1rem;
+    line-height: 2;
+  }
+
+  .emergency-card h3 {
+    font-size: 0.7rem;
+    line-height: 1.8;
+  }
+
+  .emergency-number {
+    font-size: 1.1rem;
+  }
+
+  .emergency-card p:last-child {
+    font-size: 0.55rem;
+    line-height: 1.8;
+  }
+}

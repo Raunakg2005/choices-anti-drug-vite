@@ -149,10 +149,10 @@ const EndingNegative = () => {
     let index = 0;
     
     // Calculate typing speed to match speech duration
-    // Average speech rate: ~150-200 words per minute
-    // At rate 0.6, it's slower, so adjust accordingly
-    const estimatedSpeechDuration = (text.length / 8) * 1000; // Rough estimate
-    const typingSpeed = Math.max(30, estimatedSpeechDuration / text.length); // Min 30ms per character
+    // Speech rate 0.6 = slower speech, but still need faster typing
+    // Target: ~12-15 characters per second to match speech pace
+    const charactersPerSecond = 12; // Faster to keep up with speech
+    const typingSpeed = Math.max(40, 1000 / charactersPerSecond); // ~80ms per character
     
     const typeNextChar = () => {
       if (index < text.length) {
@@ -196,10 +196,10 @@ const EndingNegative = () => {
     const startDelay = setTimeout(() => {
       // Start audio first
       speak(endingText);
-      // Start typing with slight delay to sync with speech start
+      // Start typing with minimal delay to sync with speech start
       setTimeout(() => {
         typeText(endingText);
-      }, 500);
+      }, 200);
     }, 1500);
 
     return () => {
