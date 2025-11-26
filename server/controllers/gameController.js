@@ -8,14 +8,14 @@ let isInitialized = false;
 
 function initializeGeminiAI() {
   if (isInitialized) return genAI;
-  
+
   isInitialized = true;
   const apiKey = process.env.GEMINI_API_KEY?.trim().replace(/^["']|["']$/g, '');
-  
+
   console.log('Initializing Gemini AI...');
   console.log('API Key present:', !!apiKey);
   console.log('API Key length:', apiKey?.length || 0);
-  
+
   if (apiKey && apiKey.length > 0) {
     try {
       genAI = new GoogleGenerativeAI(apiKey);
@@ -26,7 +26,7 @@ function initializeGeminiAI() {
   } else {
     console.log('⚠️ No API key found, will use fallback stories');
   }
-  
+
   return genAI;
 }
 
@@ -100,18 +100,18 @@ function getAgeCategory(age) {
 
 function getFallbackStory(stageNumber, userAge, previousChoices = []) {
   const ageCategory = getAgeCategory(userAge);
-  
+
   if (stageNumber === 1) {
     return storyTemplates[1][ageCategory];
   }
-  
+
   if (stageNumber === 4) {
     const goodChoices = previousChoices.filter(c => c === 2).length;
     if (goodChoices === 3) return storyTemplates[4].bestEnding;
     if (goodChoices >= 2) return storyTemplates[4].goodEnding;
     return storyTemplates[4].badEnding;
   }
-  
+
   // Stages 2 and 3
   const lastChoice = previousChoices[previousChoices.length - 1];
   const path = lastChoice === 2 ? 'goodPath' : 'badPath';
@@ -148,7 +148,7 @@ export const generateStory = async (req, res) => {
     const { sessionId, stageNumber, selectedChoice } = req.body;
 
     const session = await GameSession.findById(sessionId);
-    
+
     if (!session) {
       return res.status(404).json({ message: 'Game session not found' });
     }
@@ -158,7 +158,7 @@ export const generateStory = async (req, res) => {
     }
 
     let story, choice1, choice2;
-    
+
     // Get previous choices early for use in image generation
     const previousChoices = session.stages.map(s => s.selectedChoice);
 
@@ -169,7 +169,7 @@ export const generateStory = async (req, res) => {
     if (genAI) {
       try {
         let prompt = '';
-        
+
         if (stageNumber === 1) {
           // First stage - personalized introduction
           prompt = `Create an engaging anti-drug awareness story for ${session.userName}, age ${session.userAge}. ${session.userInterests ? `Interests: ${session.userInterests}.` : ''}
@@ -190,7 +190,7 @@ Choice 2: [Write the safe choice here in 12-18 words]`;
           // Subsequent stages
           const previousStage = session.stages[stageNumber - 2];
           const choiceMade = selectedChoice === 1 ? 'the risky choice (Choice 1)' : 'the safe choice (Choice 2)';
-          
+
           prompt = `Continue the anti-drug awareness story for ${session.userName}, age ${session.userAge}.
 
 PREVIOUS STAGE (Stage ${stageNumber - 1}):
@@ -215,7 +215,14 @@ Choice 2: [Write the safe choice here in 12-18 words]`;
         }
 
         // Generate story with Gemini
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const model = genAI.getGenerativeModel({
+          model: 'gemini-2.0-flash',
+          generationConfig: {
+            temperature: 0.9,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          }
+        });
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const storyText = response.text();
@@ -253,69 +260,61 @@ Choice 2: [Write the safe choice here in 12-18 words]`;
       choice2 = fallback.choice2;
     }
 
-    // Split story into sentences to generate multiple images
-    const sentences = story.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+    // Generate a single high-quality image for the entire stage
+    let generatedImage = '';
     const imageUrls = [];
 
-    // Generate AI-powered images using Gemini - one for each sentence
     if (genAI) {
       try {
-        for (let i = 0; i < sentences.length; i++) {
-          const sentence = sentences[i];
-          
-          // Use Gemini to generate a detailed image description
-          const imageModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-          const imagePrompt = `Generate a detailed, vivid image description for this scene in an anti-drug awareness story: "${sentence}"
+        // Use Gemini to generate a detailed image description for the whole scene
+        const imageModel = genAI.getGenerativeModel({
+          model: 'gemini-2.0-flash',
+          generationConfig: {
+            temperature: 0.8,
+            topP: 0.9,
+            maxOutputTokens: 512,
+          }
+        });
 
-Create a realistic, educational image description that captures:
-- The exact setting and environment described
-- Key visual elements and objects mentioned (like vape pens, pills, people, etc.)
-- The mood and emotional tone
-- Age-appropriate but impactful imagery for anti-drug education
-- 16:9 widescreen composition
+        const imagePrompt = `Generate a high-quality, detailed image generation prompt for this scene in an anti-drug awareness story: "${story}"
 
-Respond with ONLY a detailed image description (2-3 sentences), nothing else.`;
-          
-          const imageResult = await imageModel.generateContent(imagePrompt);
-          const imageResponse = await imageResult.response;
-          const imageDescription = imageResponse.text().trim();
-          
-          console.log(`\n📸 Image ${i + 1} Description for: "${sentence}"`);
-          console.log(`Description: ${imageDescription}\n`);
-          
-          // For now, we'll use the description as a base64 data URL placeholder
-          // In production, you would send this to DALL-E, Midjourney, or Stable Diffusion
-          // For demonstration, we'll create a gradient with text overlay
-          const encodedDesc = encodeURIComponent(imageDescription.substring(0, 100));
-          
-          // Using DiceBear API to generate abstract art based on description
-          // Or use Pollinations.ai which is free and generates images from text
-          const imageUrl = `https://image.pollinations.ai/prompt/${encodedDesc}?width=1600&height=900&seed=${stageNumber + i}&nologo=true`;
-          
-          imageUrls.push(imageUrl);
-          
-          // Add a small delay to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
+Create a prompt suitable for Stable Diffusion/Flux that includes:
+- Subject: The main action or character described (realistic, educational)
+- Environment: The setting details
+- Lighting/Style: Cinematic lighting, photorealistic, 8k, sharp focus, highly detailed, dramatic
+- Negative prompt elements (implicit): No text, no blur, no distortion, no cartoonish features
+
+Respond with ONLY the raw prompt text, no "Prompt:" prefix.`;
+
+        const imageResult = await imageModel.generateContent(imagePrompt);
+        const imageResponse = await imageResult.response;
+        const imageDescription = imageResponse.text().trim();
+
+        console.log(`\n📸 Image Description for Stage ${stageNumber}`);
+        console.log(`Description: ${imageDescription}\n`);
+
+        // Use a longer portion of the description for better detail, but keep it URL safe
+        const encodedDesc = encodeURIComponent(imageDescription.substring(0, 800));
+
+        // Use Pollinations.ai with Flux model for better quality
+        generatedImage = `https://image.pollinations.ai/prompt/${encodedDesc}?width=1280&height=720&model=flux&seed=${stageNumber}&nologo=true&enhance=true`;
+
+        imageUrls.push(generatedImage);
+
       } catch (imageError) {
         console.error('Image generation error, using fallback:', imageError.message);
-        // Fallback: generate thematic seeds for each sentence
+        // Fallback: generate thematic seed
         const fallbackSeeds = ['choice', 'decision', 'crossroads', 'future', 'hope', 'struggle', 'victory', 'challenge', 'path'];
-        for (let i = 0; i < sentences.length; i++) {
-          const seedIndex = (stageNumber + i + (previousChoices.filter(c => c === 2).length)) % fallbackSeeds.length;
-          imageUrls.push(`https://picsum.photos/seed/${fallbackSeeds[seedIndex]}${stageNumber}${i}/1600/900`);
-        }
+        const seedIndex = (stageNumber + (previousChoices.filter(c => c === 2).length)) % fallbackSeeds.length;
+        generatedImage = `https://picsum.photos/seed/${fallbackSeeds[seedIndex]}${stageNumber}/1600/900`;
+        imageUrls.push(generatedImage);
       }
     } else {
-      // No AI available, use basic thematic images with stage-based seeds - 16:9 aspect ratio
-      for (let i = 0; i < sentences.length; i++) {
-        const imageId = 100 + stageNumber + (previousChoices.filter(c => c === 2).length * 10) + i;
-        imageUrls.push(`https://picsum.photos/seed/${imageId}/1600/900`);
-      }
+      // No AI available, use basic thematic image
+      const imageId = 100 + stageNumber + (previousChoices.filter(c => c === 2).length * 10);
+      generatedImage = `https://picsum.photos/seed/${imageId}/1600/900`;
+      imageUrls.push(generatedImage);
     }
-
-    // Use first image as primary (for backward compatibility)
-    const generatedImage = imageUrls[0] || `https://picsum.photos/seed/${stageNumber}/1600/900`;
 
     // Save stage to session
     session.stages.push({
@@ -350,9 +349,9 @@ Respond with ONLY a detailed image description (2-3 sentences), nothing else.`;
     });
   } catch (error) {
     console.error('Generate story error:', error);
-    res.status(500).json({ 
-      message: 'Error generating story', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Error generating story',
+      error: error.message
     });
   }
 };
@@ -360,14 +359,14 @@ Respond with ONLY a detailed image description (2-3 sentences), nothing else.`;
 export const getGameSession = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Validate ObjectId format
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({ message: 'Invalid session ID format' });
     }
-    
+
     const session = await GameSession.findById(id);
-    
+
     if (!session) {
       return res.status(404).json({ message: 'Game session not found' });
     }
@@ -403,16 +402,24 @@ export const generateImage = async (req, res) => {
     if (genAI) {
       try {
         // Using Gemini to generate image description
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const model = genAI.getGenerativeModel({
+          model: 'gemini-2.0-flash',
+          generationConfig: {
+            temperature: 0.8,
+            topP: 0.9,
+            maxOutputTokens: 512,
+          }
+        });
         const result = await model.generateContent(
-          `Create a detailed visual description for an educational anti-drug awareness image based on: ${prompt}. The description should be suitable for image generation AI.`
+          `Create a high-quality image generation prompt based on: ${prompt}. Include keywords for photorealism, cinematic lighting, and 8k resolution. Respond with ONLY the prompt.`
         );
-        
+
         const response = await result.response;
         const description = response.text();
 
-        // Placeholder image URL (in production, use actual image generation)
-        const imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(prompt)}`;
+        // Use Pollinations.ai with Flux model
+        const encodedDesc = encodeURIComponent(description.substring(0, 800));
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedDesc}?width=1280&height=720&model=flux&nologo=true&enhance=true`;
 
         res.json({
           imageUrl,

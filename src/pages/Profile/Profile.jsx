@@ -48,7 +48,7 @@ const Profile = () => {
 
   const fetchGameSessions = async () => {
     try {
-      const response = await api.get('/game/sessions/user');
+      const response = await api.get('/game/sessions');
       const sessions = response.data;
       setGameSessions(sessions);
 

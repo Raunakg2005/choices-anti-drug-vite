@@ -27,8 +27,8 @@ dist-ssr
 .vite
 build
 npm-debug.log*
-.env
-.env.local
+.env.example
+.env*
 
 # OS
 Thumbs.db
