@@ -54,6 +54,22 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/game', gameRoutes);
 app.use('/api', resourceRoutes);
 
+// Root API endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Choices Anti-Drug API',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      auth: '/api/auth',
+      forum: '/api/forum',
+      game: '/api/game',
+      resources: '/api/resources',
+      health: '/api/health'
+    }
+  });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
