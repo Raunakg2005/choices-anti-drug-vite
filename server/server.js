@@ -31,12 +31,14 @@ const corsOptions = {
       'http://localhost:5173',
       'http://localhost:3000',
       'http://127.0.0.1:5173',
-      process.env.FRONTEND_URL, // Add your frontend Vercel URL in env vars
+      'https://sudo-choices2.vercel.app', // Production frontend URL
+      process.env.FRONTEND_URL, // Additional frontend URL from env vars
     ].filter(Boolean); // Remove undefined values
 
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
+      console.log('CORS rejected origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -53,6 +55,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/game', gameRoutes);
 app.use('/api', resourceRoutes);
+
+// Root path handler
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to Choices Anti-Drug API',
+    version: '1.0.0',
+    documentation: '/api',
+    note: 'Visit /api for available endpoints'
+  });
+});
 
 // Root API endpoint
 app.get('/api', (req, res) => {
